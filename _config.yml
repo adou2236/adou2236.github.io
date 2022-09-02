@@ -102,4 +102,6 @@ theme: ayer
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: https://github.com/adou2236/adou2236.github.io.git
+  branch: hexo-page

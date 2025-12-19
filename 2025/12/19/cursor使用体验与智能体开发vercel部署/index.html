@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>cursor使用体验与智能体组件开发 |  阿斗的个人博客</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    </head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-cursor使用体验与智能体开发vercel部署"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  cursor使用体验与智能体组件开发
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2025/12/19/cursor%E4%BD%BF%E7%94%A8%E4%BD%93%E9%AA%8C%E4%B8%8E%E6%99%BA%E8%83%BD%E4%BD%93%E5%BC%80%E5%8F%91vercel%E9%83%A8%E7%BD%B2/" class="article-date">
+  <time datetime="2025-12-19T02:02:38.000Z" itemprop="datePublished">2025-12-19</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">4k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">18 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>ps：整个项目全是使用cursor进行生成，个人没有写一行代码，包括这篇文章也是</p>
+<h1 id="使用-Next-js、AI-SDK-和-Vercel-构建智能对话机器人平台"><a href="#使用-Next-js、AI-SDK-和-Vercel-构建智能对话机器人平台" class="headerlink" title="使用 Next.js、AI SDK 和 Vercel 构建智能对话机器人平台"></a>使用 Next.js、AI SDK 和 Vercel 构建智能对话机器人平台</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>在 AI 快速发展的今天，构建一个功能完善、体验流畅的智能对话机器人平台是许多开发者的目标。本文将深入探讨如何使用 Next.js 15、Vercel AI SDK、Google Gemini 以及 Vercel 平台构建一个功能丰富的 AI 聊天机器人应用。</p>
+<h3 id="项目概述"><a href="#项目概述" class="headerlink" title="项目概述"></a>项目概述</h3><p>本项目是一个基于 Next.js 15 的 AI 聊天机器人平台，核心特性包括：</p>
+<ul>
+<li><strong>智能对话系统</strong>：集成 Google Gemini 2.5 Pro 模型，支持流式响应和工具调用</li>
+<li><strong>组件化架构</strong>：20+ 个可复用的 UI 组件，支持动态注册和渲染</li>
+<li><strong>Bot 管理系统</strong>：允许用户通过组合组件创建自定义 AI 机器人</li>
+<li><strong>多会话管理</strong>：支持多个对话会话，每个 Bot 拥有独立的会话历史</li>
+<li><strong>组件市场</strong>：可视化的组件浏览和选择界面</li>
+</ul>
+<h3 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h3><ul>
+<li><strong>前端框架</strong>：Next.js 15.5.7（App Router）</li>
+<li><strong>AI SDK</strong>：Vercel AI SDK 3.4.9 + @ai-sdk/google</li>
+<li><strong>数据库</strong>：Vercel Postgres + Drizzle ORM</li>
+<li><strong>认证</strong>：NextAuth.js v5</li>
+<li><strong>UI 组件库</strong>：shadcn/ui + Radix UI + Tailwind CSS</li>
+<li><strong>部署平台</strong>：Vercel</li>
+</ul>
+<hr>
+<h2 id="技术架构深度解析"><a href="#技术架构深度解析" class="headerlink" title="技术架构深度解析"></a>技术架构深度解析</h2><h3 id="2-1-Next-js-15-App-Router-实践"><a href="#2-1-Next-js-15-App-Router-实践" class="headerlink" title="2.1 Next.js 15 App Router 实践"></a>2.1 Next.js 15 App Router 实践</h3><p>Next.js 15 的 App Router 为应用提供了强大的路由和渲染能力。本项目充分利用了 App Router 的特性：</p>
+<h4 id="路由结构"><a href="#路由结构" class="headerlink" title="路由结构"></a>路由结构</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">app/</span><br><span class="line">├── (auth)/          # 路由组：认证相关页面</span><br><span class="line">│   ├── login/</span><br><span class="line">│   └── register/</span><br><span class="line">├── (home)/          # 路由组：主应用页面</span><br><span class="line">│   ├── market/      # 组件市场</span><br><span class="line">│   └── bots/        # Bot 列表</span><br><span class="line">└── chat/            # 聊天页面</span><br><span class="line">    └── [botId]/     # 动态路由：Bot ID</span><br><span class="line">        └── [id]/    # 动态路由：会话 ID</span><br></pre></td></tr></table></figure>
+
+<p>路由组 <code>(auth)</code> 和 <code>(home)</code> 使用括号命名，不会影响 URL 路径，但可以共享布局组件。</p>
+<h4 id="React-Server-Components-的使用"><a href="#React-Server-Components-的使用" class="headerlink" title="React Server Components 的使用"></a>React Server Components 的使用</h4><p>在 API 路由中，我们使用 Server Components 处理服务端逻辑：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">export async function POST(request: Request) &#123;</span><br><span class="line">  const &#123; id, messages, botId &#125; = await request.json();</span><br><span class="line">  const session = await auth();</span><br><span class="line"></span><br><span class="line">  if (!session) &#123;</span><br><span class="line">    return new Response(&quot;Unauthorized&quot;, &#123; status: 401 &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // 服务端处理逻辑</span><br><span class="line">  const coreMessages = convertToCoreMessages(messages);</span><br><span class="line">  // ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Server Components 的优势：</p>
+<ul>
+<li><strong>性能优化</strong>：减少客户端 JavaScript 包大小</li>
+<li><strong>安全性</strong>：敏感逻辑在服务端执行</li>
+<li><strong>SEO 友好</strong>：服务端渲染提升首屏加载速度</li>
+</ul>
+<h4 id="Server-Actions-实现数据操作"><a href="#Server-Actions-实现数据操作" class="headerlink" title="Server Actions 实现数据操作"></a>Server Actions 实现数据操作</h4><p>虽然本项目主要使用 API Routes，但 Server Actions 同样可以用于数据操作：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Server Action 示例</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">createBot</span>(<span class="params">formData: FormData</span>) &#123;</span><br><span class="line">  <span class="string">&#x27;use server&#x27;</span></span><br><span class="line">  <span class="keyword">const</span> name = formData.<span class="title function_">get</span>(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">  <span class="comment">// 直接操作数据库</span></span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">createBotInDB</span>(&#123; name &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-AI-SDK-集成与工具调用系统"><a href="#2-2-AI-SDK-集成与工具调用系统" class="headerlink" title="2.2 AI SDK 集成与工具调用系统"></a>2.2 AI SDK 集成与工具调用系统</h3><p>Vercel AI SDK 提供了统一的 API 来与各种 LLM 提供商交互。本项目使用 Google Gemini 作为主要模型。</p>
+<h4 id="模型配置"><a href="#模型配置" class="headerlink" title="模型配置"></a>模型配置</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import &#123; google &#125; from &quot;@ai-sdk/google&quot;;</span><br><span class="line">import &#123; experimental_wrapLanguageModel as wrapLanguageModel &#125; from &quot;ai&quot;;</span><br><span class="line">import &#123; customMiddleware &#125; from &quot;./custom-middleware&quot;;</span><br><span class="line"></span><br><span class="line">export const geminiProModel = wrapLanguageModel(&#123;</span><br><span class="line">  model: google(&quot;gemini-2.5-pro&quot;),</span><br><span class="line">  middleware: customMiddleware,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><code>wrapLanguageModel</code> 允许我们添加自定义中间件，用于日志记录、错误处理等。</p>
+<h4 id="流式响应实现"><a href="#流式响应实现" class="headerlink" title="流式响应实现"></a>流式响应实现</h4><p>流式响应是 AI 聊天应用的核心特性，能够实时显示 AI 生成的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">const result = await streamText(&#123;</span><br><span class="line">  model: geminiProModel,</span><br><span class="line">  system: systemPrompt,</span><br><span class="line">  messages: coreMessages,</span><br><span class="line">  tools,</span><br><span class="line">  onFinish: async (&#123; responseMessages &#125;) =&gt; &#123;</span><br><span class="line">    // 保存对话到数据库</span><br><span class="line">    await saveChat(&#123;</span><br><span class="line">      id,</span><br><span class="line">      messages: [...coreMessages, ...responseMessages],</span><br><span class="line">      userId: session.user.id,</span><br><span class="line">      botId: botId || undefined,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">return result.toDataStreamResponse(&#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><code>streamText</code> 函数返回一个流式响应对象，客户端可以通过 <code>useChat</code> Hook 接收流式数据。</p>
+<h4 id="工具调用（Tool-Calling）机制"><a href="#工具调用（Tool-Calling）机制" class="headerlink" title="工具调用（Tool Calling）机制"></a>工具调用（Tool Calling）机制</h4><p>AI SDK 支持工具调用功能，允许 AI 模型调用预定义的函数。工具定义包含三个部分：</p>
+<ol>
+<li><strong>description</strong>：工具的描述，帮助 AI 理解何时使用该工具</li>
+<li><strong>parameters</strong>：使用 Zod schema 定义参数结构</li>
+<li><strong>execute</strong>：工具执行函数</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  toolName: &quot;getWeather&quot;,</span><br><span class="line">  toolDescription: &quot;Get the current weather at a location&quot;,</span><br><span class="line">  toolParameters: z.object(&#123;</span><br><span class="line">    latitude: z.number().describe(&quot;Latitude coordinate&quot;),</span><br><span class="line">    longitude: z.number().describe(&quot;Longitude coordinate&quot;),</span><br><span class="line">  &#125;),</span><br><span class="line">  toolExecute: async (&#123; latitude, longitude &#125;) =&gt; &#123;</span><br><span class="line">    const response = await fetch(</span><br><span class="line">      `https://api.open-meteo.com/v1/forecast?latitude=$&#123;latitude&#125;&amp;longitude=$&#123;longitude&#125;&amp;...`</span><br><span class="line">    );</span><br><span class="line">    return await response.json();</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当 AI 决定调用工具时，会返回工具调用请求，服务端执行工具并返回结果，AI 再基于结果生成最终回复。</p>
+<h4 id="动态工具构建系统"><a href="#动态工具构建系统" class="headerlink" title="动态工具构建系统"></a>动态工具构建系统</h4><p>本项目实现了动态工具构建系统，可以根据 Bot 配置加载不同的工具集：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">export function buildToolsFromRegistry(</span><br><span class="line">  componentIds?: string[],</span><br><span class="line">  context?: &#123; session?: any &#125;</span><br><span class="line">): Record&lt;string, any&gt; &#123;</span><br><span class="line">  const tools: Record&lt;string, any&gt; = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  for (const component of componentsRegistry) &#123;</span><br><span class="line">    // 如果指定了 componentIds，只包含匹配的工具</span><br><span class="line">    if (componentIds &amp;&amp; !componentIds.includes(component.id)) &#123;</span><br><span class="line">      continue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (</span><br><span class="line">      component.toolName &amp;&amp;</span><br><span class="line">      component.toolDescription &amp;&amp;</span><br><span class="line">      component.toolParameters &amp;&amp;</span><br><span class="line">      component.toolExecute</span><br><span class="line">    ) &#123;</span><br><span class="line">      tools[component.toolName] = &#123;</span><br><span class="line">        description: component.toolDescription,</span><br><span class="line">        parameters: component.toolParameters,</span><br><span class="line">        execute: async (params: any) =&gt; &#123;</span><br><span class="line">          return await component.toolExecute!(params, context);</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return tools;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种设计使得每个 Bot 可以拥有不同的能力集，实现了高度的可定制性。</p>
+<h3 id="2-3-组件注册与动态渲染系统"><a href="#2-3-组件注册与动态渲染系统" class="headerlink" title="2.3 组件注册与动态渲染系统"></a>2.3 组件注册与动态渲染系统</h3><p>组件注册系统是本项目的核心创新之一，它将 UI 组件、工具定义和 AI 能力统一管理。</p>
+<h4 id="组件注册表设计"><a href="#组件注册表设计" class="headerlink" title="组件注册表设计"></a>组件注册表设计</h4><p>每个组件在注册表中包含以下信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">export interface ComponentRegistryItem &#123;</span><br><span class="line">  id: string;                    // 组件唯一标识</span><br><span class="line">  name: string;                  // 组件显示名称</span><br><span class="line">  component: ComponentType&lt;any&gt;; // React 组件</span><br><span class="line">  defaultProps: Record&lt;string, any&gt;; // 默认属性</span><br><span class="line">  toolName?: string;             // 对应的工具名称</span><br><span class="line">  toolDescription?: string;       // 工具描述</span><br><span class="line">  toolParameters?: z.ZodObject&lt;any&gt;; // 工具参数 Schema</span><br><span class="line">  toolExecute?: (params: any, context?: any) =&gt; Promise&lt;any&gt;; // 工具执行函数</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="工具定义的三要素"><a href="#工具定义的三要素" class="headerlink" title="工具定义的三要素"></a>工具定义的三要素</h4><ol>
+<li><strong>toolDescription</strong>：告诉 AI 这个工具能做什么</li>
+<li><strong>toolParameters</strong>：使用 Zod 定义参数类型和验证规则</li>
+<li><strong>toolExecute</strong>：实际执行逻辑，可以调用外部 API、查询数据库等</li>
+</ol>
+<p>示例：天气组件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  id: &quot;weather&quot;,</span><br><span class="line">  name: &quot;天气组件&quot;,</span><br><span class="line">  component: Weather,</span><br><span class="line">  toolName: &quot;getWeather&quot;,</span><br><span class="line">  toolDescription: &quot;Get the current weather at a location&quot;,</span><br><span class="line">  toolParameters: z.object(&#123;</span><br><span class="line">    latitude: z.number().describe(&quot;Latitude coordinate&quot;),</span><br><span class="line">    longitude: z.number().describe(&quot;Longitude coordinate&quot;),</span><br><span class="line">  &#125;),</span><br><span class="line">  toolExecute: async (&#123; latitude, longitude &#125;) =&gt; &#123;</span><br><span class="line">    const response = await fetch(</span><br><span class="line">      `https://api.open-meteo.com/v1/forecast?latitude=$&#123;latitude&#125;&amp;longitude=$&#123;longitude&#125;&amp;...`</span><br><span class="line">    );</span><br><span class="line">    return await response.json();</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="AI-工具调用到组件渲染的流程"><a href="#AI-工具调用到组件渲染的流程" class="headerlink" title="AI 工具调用到组件渲染的流程"></a>AI 工具调用到组件渲染的流程</h4><p>完整的调用流程如下：</p>
+<ol>
+<li><strong>用户输入</strong>：用户在聊天界面输入消息</li>
+<li><strong>AI 处理</strong>：AI 模型分析消息，决定是否需要调用工具</li>
+<li><strong>工具调用</strong>：如果决定调用工具，AI 返回工具调用请求（包含工具名和参数）</li>
+<li><strong>工具执行</strong>：服务端执行 <code>toolExecute</code> 函数，获取结果</li>
+<li><strong>AI 回复</strong>：AI 基于工具结果生成最终回复</li>
+<li><strong>组件渲染</strong>：客户端根据工具调用结果渲染对应的 React 组件</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;toolInvocations.map((toolInvocation) =&gt; &#123;</span><br><span class="line">  const &#123; toolName, toolCallId, state, result &#125; = toolInvocation;</span><br><span class="line"></span><br><span class="line">  if (state === &quot;result&quot;) &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div key=&#123;toolCallId&#125;&gt;</span><br><span class="line">        &#123;toolName === &quot;getWeather&quot; ? (</span><br><span class="line">          &lt;Weather weatherAtLocation=&#123;result&#125; /&gt;</span><br><span class="line">        ) : toolName === &quot;playMusic&quot; ? (</span><br><span class="line">          &lt;MusicPlayer MusicPlayerProps=&#123;result&#125; /&gt;</span><br><span class="line">        ) : /* ... 其他组件 */</span><br><span class="line">        &#125;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    // 加载状态：显示骨架屏</span><br><span class="line">    return &lt;ComponentSkeleton /&gt;;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-Bot-创建与管理系统"><a href="#2-4-Bot-创建与管理系统" class="headerlink" title="2.4 Bot 创建与管理系统"></a>2.4 Bot 创建与管理系统</h3><p>Bot 系统允许用户通过组合不同的组件来创建自定义 AI 机器人。</p>
+<h4 id="组件选择与组合"><a href="#组件选择与组合" class="headerlink" title="组件选择与组合"></a>组件选择与组合</h4><p>在组件市场中，用户可以选择多个组件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">const [selectedComponentIds, setSelectedComponentIds] = useState&lt;Set&lt;string&gt;&gt;(</span><br><span class="line">  new Set()</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">const toggleComponentSelection = (componentId: string) =&gt; &#123;</span><br><span class="line">  setSelectedComponentIds((prev) =&gt; &#123;</span><br><span class="line">    const newSet = new Set(prev);</span><br><span class="line">    if (newSet.has(componentId)) &#123;</span><br><span class="line">      newSet.delete(componentId);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      newSet.add(componentId);</span><br><span class="line">    &#125;</span><br><span class="line">    return newSet;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Bot-数据库设计"><a href="#Bot-数据库设计" class="headerlink" title="Bot 数据库设计"></a>Bot 数据库设计</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">export const bot = pgTable(&quot;Bot&quot;, &#123;</span><br><span class="line">  id: uuid(&quot;id&quot;).primaryKey().notNull().defaultRandom(),</span><br><span class="line">  name: varchar(&quot;name&quot;, &#123; length: 255 &#125;).notNull(),</span><br><span class="line">  description: varchar(&quot;description&quot;, &#123; length: 1000 &#125;),</span><br><span class="line">  prompt: text(&quot;prompt&quot;),                    // 自定义提示词</span><br><span class="line">  componentIds: json(&quot;componentIds&quot;).$type&lt;string[]&gt;(), // 关联的组件 ID 列表</span><br><span class="line">  shortcuts: json(&quot;shortcuts&quot;).$type&lt;string[]&gt;(),       // 快捷指令列表</span><br><span class="line">  createdAt: timestamp(&quot;createdAt&quot;).notNull().defaultNow(),</span><br><span class="line">  updatedAt: timestamp(&quot;updatedAt&quot;).notNull().defaultNow(),</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="自定义提示词和快捷指令"><a href="#自定义提示词和快捷指令" class="headerlink" title="自定义提示词和快捷指令"></a>自定义提示词和快捷指令</h4><p>每个 Bot 可以拥有：</p>
+<ul>
+<li><strong>自定义提示词</strong>：定义 Bot 的行为和风格</li>
+<li><strong>快捷指令</strong>：预设的快捷操作按钮</li>
+<li><strong>组件能力</strong>：通过 <code>componentIds</code> 限制 Bot 可用的工具</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if (botId) &#123;</span><br><span class="line">  const bot = await getBotById(&#123; id: botId &#125;);</span><br><span class="line">  if (bot) &#123;</span><br><span class="line">    componentIds = (bot.componentIds as string[]) || [];</span><br><span class="line">    if (bot.prompt) &#123;</span><br><span class="line">      systemPrompt = bot.prompt;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 根据 componentIds 过滤工具</span><br><span class="line">const tools = buildToolsFromRegistry(componentIds, &#123; session &#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Bot-特定的工具加载"><a href="#Bot-特定的工具加载" class="headerlink" title="Bot 特定的工具加载"></a>Bot 特定的工具加载</h4><p>当用户进入某个 Bot 的聊天界面时，系统会：</p>
+<ol>
+<li>从数据库加载 Bot 配置</li>
+<li>根据 <code>componentIds</code> 过滤可用工具</li>
+<li>使用 Bot 的自定义提示词</li>
+<li>在输入框显示快捷指令</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">const suggestedActions = shortcuts &amp;&amp; shortcuts.length &gt; 0</span><br><span class="line">  ? shortcuts.map((shortcut) =&gt; (&#123;</span><br><span class="line">      title: shortcut,</span><br><span class="line">      label: &quot;&quot;,</span><br><span class="line">      action: shortcut,</span><br><span class="line">    &#125;))</span><br><span class="line">  : DEFAULT_SUGGESTED_ACTIONS;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-5-数据库设计与-ORM-使用"><a href="#2-5-数据库设计与-ORM-使用" class="headerlink" title="2.5 数据库设计与 ORM 使用"></a>2.5 数据库设计与 ORM 使用</h3><p>本项目使用 Drizzle ORM 作为数据库操作层，提供了类型安全的数据库访问。</p>
+<h4 id="Drizzle-ORM-配置"><a href="#Drizzle-ORM-配置" class="headerlink" title="Drizzle ORM 配置"></a>Drizzle ORM 配置</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import &#123; drizzle &#125; from &quot;drizzle-orm/postgres-js&quot;;</span><br><span class="line">import postgres from &quot;postgres&quot;;</span><br><span class="line"></span><br><span class="line">let client = postgres(`$&#123;process.env.POSTGRES_URL!&#125;?sslmode=require`);</span><br><span class="line">let db = drizzle(client);</span><br></pre></td></tr></table></figure>
+
+<h4 id="数据模型定义"><a href="#数据模型定义" class="headerlink" title="数据模型定义"></a>数据模型定义</h4><p>使用 Drizzle 的类型系统定义数据模型：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">export const user = pgTable(&quot;User&quot;, &#123;</span><br><span class="line">  id: uuid(&quot;id&quot;).primaryKey().notNull().defaultRandom(),</span><br><span class="line">  email: varchar(&quot;email&quot;, &#123; length: 64 &#125;).notNull(),</span><br><span class="line">  password: varchar(&quot;password&quot;, &#123; length: 64 &#125;),</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">export const chat = pgTable(&quot;Chat&quot;, &#123;</span><br><span class="line">  id: uuid(&quot;id&quot;).primaryKey().notNull().defaultRandom(),</span><br><span class="line">  createdAt: timestamp(&quot;createdAt&quot;).notNull(),</span><br><span class="line">  messages: json(&quot;messages&quot;).notNull(),</span><br><span class="line">  userId: uuid(&quot;userId&quot;)</span><br><span class="line">    .notNull()</span><br><span class="line">    .references(() =&gt; user.id),</span><br><span class="line">  botId: uuid(&quot;botId&quot;).references(() =&gt; bot.id), // 关联 Bot</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="查询函数封装"><a href="#查询函数封装" class="headerlink" title="查询函数封装"></a>查询函数封装</h4><p>将常用查询封装为函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">export async function getChatsByUserId(&#123;</span><br><span class="line">  id,</span><br><span class="line">  botId,</span><br><span class="line">&#125;: &#123;</span><br><span class="line">  id: string;</span><br><span class="line">  botId?: string | null;</span><br><span class="line">&#125;) &#123;</span><br><span class="line">  let whereCondition = eq(chat.userId, id);</span><br><span class="line"></span><br><span class="line">  if (botId !== undefined) &#123;</span><br><span class="line">    if (botId === null || botId === &quot;default&quot;) &#123;</span><br><span class="line">      whereCondition = and(eq(chat.userId, id), isNull(chat.botId)) as any;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      whereCondition = and(eq(chat.userId, id), eq(chat.botId, botId)) as any;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return await db</span><br><span class="line">    .select()</span><br><span class="line">    .from(chat)</span><br><span class="line">    .where(whereCondition)</span><br><span class="line">    .orderBy(desc(chat.createdAt));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Drizzle 的优势：</p>
+<ul>
+<li><strong>类型安全</strong>：TypeScript 类型推断</li>
+<li><strong>SQL-like 语法</strong>：直观的查询构建</li>
+<li><strong>迁移支持</strong>：自动生成迁移文件</li>
+</ul>
+<h3 id="2-6-认证系统"><a href="#2-6-认证系统" class="headerlink" title="2.6 认证系统"></a>2.6 认证系统</h3><p>使用 NextAuth.js v5 实现认证功能。</p>
+<h4 id="NextAuth-js-v5-配置"><a href="#NextAuth-js-v5-配置" class="headerlink" title="NextAuth.js v5 配置"></a>NextAuth.js v5 配置</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">import NextAuth from &quot;next-auth&quot;;</span><br><span class="line">import Credentials from &quot;next-auth/providers/credentials&quot;;</span><br><span class="line">import &#123; getUser &#125; from &quot;@/db/queries&quot;;</span><br><span class="line">import &#123; compare &#125; from &quot;bcrypt-ts&quot;;</span><br><span class="line"></span><br><span class="line">export const &#123;</span><br><span class="line">  handlers: &#123; GET, POST &#125;,</span><br><span class="line">  auth,</span><br><span class="line">  signIn,</span><br><span class="line">  signOut,</span><br><span class="line">&#125; = NextAuth(&#123;</span><br><span class="line">  providers: [</span><br><span class="line">    Credentials(&#123;</span><br><span class="line">      async authorize(&#123; email, password &#125;: any) &#123;</span><br><span class="line">        let users = await getUser(email);</span><br><span class="line">        if (users.length === 0) return null;</span><br><span class="line">        let passwordsMatch = await compare(password, users[0].password!);</span><br><span class="line">        if (passwordsMatch) return users[0] as any;</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">  callbacks: &#123;</span><br><span class="line">    async jwt(&#123; token, user &#125;) &#123;</span><br><span class="line">      if (user) &#123;</span><br><span class="line">        token.id = user.id;</span><br><span class="line">      &#125;</span><br><span class="line">      return token;</span><br><span class="line">    &#125;,</span><br><span class="line">    async session(&#123; session, token &#125;) &#123;</span><br><span class="line">      if (session.user) &#123;</span><br><span class="line">        session.user.id = token.id as string;</span><br><span class="line">      &#125;</span><br><span class="line">      return session;</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Session-管理"><a href="#Session-管理" class="headerlink" title="Session 管理"></a>Session 管理</h4><p>在 API 路由中使用 <code>auth()</code> 获取当前会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">const session = await auth();</span><br><span class="line"></span><br><span class="line">if (!session) &#123;</span><br><span class="line">  return new Response(&quot;Unauthorized&quot;, &#123; status: 401 &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-7-Vercel-部署与优化"><a href="#2-7-Vercel-部署与优化" class="headerlink" title="2.7 Vercel 部署与优化"></a>2.7 Vercel 部署与优化</h3><h4 id="Vercel-Postgres-集成"><a href="#Vercel-Postgres-集成" class="headerlink" title="Vercel Postgres 集成"></a>Vercel Postgres 集成</h4><p>Vercel Postgres 是基于 Neon 的 Serverless Postgres 数据库，与 Vercel 平台无缝集成：</p>
+<ol>
+<li><strong>环境变量配置</strong>：在 Vercel 控制台设置 <code>POSTGRES_URL</code></li>
+<li><strong>自动连接池</strong>：Vercel 自动管理数据库连接</li>
+<li><strong>全球分布</strong>：数据自动复制到多个区域</li>
+</ol>
+<h4 id="Vercel-Blob-存储"><a href="#Vercel-Blob-存储" class="headerlink" title="Vercel Blob 存储"></a>Vercel Blob 存储</h4><p>用于存储用户上传的文件：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; put &#125; <span class="keyword">from</span> <span class="string">&quot;@vercel/blob&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> blob = <span class="keyword">await</span> <span class="title function_">put</span>(filename, file, &#123;</span><br><span class="line">  <span class="attr">access</span>: <span class="string">&quot;public&quot;</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="部署最佳实践"><a href="#部署最佳实践" class="headerlink" title="部署最佳实践"></a>部署最佳实践</h4><ol>
+<li><strong>环境变量</strong>：使用 Vercel 的环境变量管理功能</li>
+<li><strong>构建优化</strong>：Next.js 自动优化生产构建</li>
+<li><strong>边缘函数</strong>：API Routes 自动部署为 Serverless Functions</li>
+<li><strong>CDN 加速</strong>：静态资源自动通过 Vercel Edge Network 分发</li>
+</ol>
+<hr>
+<h2 id="核心功能实现细节"><a href="#核心功能实现细节" class="headerlink" title="核心功能实现细节"></a>核心功能实现细节</h2><h3 id="3-1-流式聊天实现"><a href="#3-1-流式聊天实现" class="headerlink" title="3.1 流式聊天实现"></a>3.1 流式聊天实现</h3><h4 id="useChat-Hook-使用"><a href="#useChat-Hook-使用" class="headerlink" title="useChat Hook 使用"></a>useChat Hook 使用</h4><p><code>useChat</code> 是 AI SDK 提供的 React Hook，简化了聊天功能的实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">const &#123; messages, handleSubmit, input, setInput, append, isLoading, stop &#125; =</span><br><span class="line">  useChat(&#123;</span><br><span class="line">    api: &quot;/chat/api/chat&quot;,</span><br><span class="line">    id,</span><br><span class="line">    body: &#123; id, botId &#125;,</span><br><span class="line">    initialMessages,</span><br><span class="line">    maxSteps: 10,</span><br><span class="line">    onFinish: () =&gt; &#123;</span><br><span class="line">      window.history.replaceState(&#123;&#125;, &quot;&quot;, `/chat/$&#123;botId&#125;/$&#123;id&#125;`);</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="消息状态管理"><a href="#消息状态管理" class="headerlink" title="消息状态管理"></a>消息状态管理</h4><p><code>useChat</code> 自动管理消息状态：</p>
+<ul>
+<li><strong>messages</strong>：当前会话的所有消息</li>
+<li><strong>isLoading</strong>：是否正在等待 AI 响应</li>
+<li><strong>toolInvocations</strong>：工具调用状态（pending、result、error）</li>
+</ul>
+<h4 id="工具调用结果渲染"><a href="#工具调用结果渲染" class="headerlink" title="工具调用结果渲染"></a>工具调用结果渲染</h4><p>工具调用结果通过 <code>message.toolInvocations</code> 访问：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;messages.map((message) =&gt; (</span><br><span class="line">  &lt;PreviewMessage</span><br><span class="line">    key=&#123;message.id&#125;</span><br><span class="line">    role=&#123;message.role&#125;</span><br><span class="line">    content=&#123;message.content&#125;</span><br><span class="line">    toolInvocations=&#123;message.toolInvocations&#125;</span><br><span class="line">  /&gt;</span><br><span class="line">))&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-多会话管理"><a href="#3-2-多会话管理" class="headerlink" title="3.2 多会话管理"></a>3.2 多会话管理</h3><h4 id="会话历史记录"><a href="#会话历史记录" class="headerlink" title="会话历史记录"></a>会话历史记录</h4><p>每个用户的会话历史存储在数据库中，支持按 Bot 过滤：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const &#123; data: chats &#125; = useSWR(</span><br><span class="line">  `/chat/api/history?botId=$&#123;botId || &quot;default&quot;&#125;`,</span><br><span class="line">  fetcher</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Bot-关联的会话过滤"><a href="#Bot-关联的会话过滤" class="headerlink" title="Bot 关联的会话过滤"></a>Bot 关联的会话过滤</h4><p>查询时根据 <code>botId</code> 过滤会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (botId !== undefined &amp;&amp; botId !== null &amp;&amp; botId !== &quot;default&quot;) &#123;</span><br><span class="line">  whereCondition = and(eq(chat.userId, id), eq(chat.botId, botId)) as any;</span><br><span class="line">&#125; else &#123;</span><br><span class="line">  whereCondition = and(eq(chat.userId, id), isNull(chat.botId)) as any;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="会话删除功能"><a href="#会话删除功能" class="headerlink" title="会话删除功能"></a>会话删除功能</h4><p>支持删除单个会话：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">export async function DELETE(request: Request) &#123;</span><br><span class="line">  const &#123; searchParams &#125; = new URL(request.url);</span><br><span class="line">  const id = searchParams.get(&quot;id&quot;);</span><br><span class="line">  </span><br><span class="line">  const session = await auth();</span><br><span class="line">  const chat = await getChatById(&#123; id &#125;);</span><br><span class="line">  </span><br><span class="line">  if (chat.userId !== session.user.id) &#123;</span><br><span class="line">    return new Response(&quot;Unauthorized&quot;, &#123; status: 401 &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  await deleteChatById(&#123; id &#125;);</span><br><span class="line">  return new Response(&quot;Chat deleted&quot;, &#123; status: 200 &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-组件市场"><a href="#3-3-组件市场" class="headerlink" title="3.3 组件市场"></a>3.3 组件市场</h3><h4 id="本地组件注册"><a href="#本地组件注册" class="headerlink" title="本地组件注册"></a>本地组件注册</h4><p>组件市场直接从本地注册表读取组件信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import &#123; componentsRegistry &#125; from &quot;@/lib/components-registry&quot;;</span><br><span class="line"></span><br><span class="line">const filteredComponents = useMemo(() =&gt; &#123;</span><br><span class="line">  if (!search.trim()) &#123;</span><br><span class="line">    return componentsRegistry;</span><br><span class="line">  &#125;</span><br><span class="line">  const searchLower = search.toLowerCase();</span><br><span class="line">  return componentsRegistry.filter(</span><br><span class="line">    (item) =&gt;</span><br><span class="line">      item.name.toLowerCase().includes(searchLower) ||</span><br><span class="line">      item.toolName?.toLowerCase().includes(searchLower)</span><br><span class="line">  );</span><br><span class="line">&#125;, [search]);</span><br></pre></td></tr></table></figure>
+
+<h4 id="搜索过滤功能"><a href="#搜索过滤功能" class="headerlink" title="搜索过滤功能"></a>搜索过滤功能</h4><p>使用 <code>useMemo</code> 优化搜索性能，避免不必要的重新计算。</p>
+<h4 id="组件选择与预览"><a href="#组件选择与预览" class="headerlink" title="组件选择与预览"></a>组件选择与预览</h4><p>用户可以选择组件并实时预览：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;filteredComponents.map((item) =&gt; &#123;</span><br><span class="line">  const Component = item.component;</span><br><span class="line">  const isSelected = selectedComponentIds.has(item.id);</span><br><span class="line">  return (</span><br><span class="line">    &lt;div key=&#123;item.id&#125;&gt;</span><br><span class="line">      &lt;Component &#123;...item.defaultProps&#125; /&gt;</span><br><span class="line">      &#123;/* 选择状态指示 */&#125;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;)&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="代码示例与最佳实践"><a href="#代码示例与最佳实践" class="headerlink" title="代码示例与最佳实践"></a>代码示例与最佳实践</h2><h3 id="关键代码片段"><a href="#关键代码片段" class="headerlink" title="关键代码片段"></a>关键代码片段</h3><h4 id="1-动态工具构建"><a href="#1-动态工具构建" class="headerlink" title="1. 动态工具构建"></a>1. 动态工具构建</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">buildToolsFromRegistry</span>(<span class="params"></span></span><br><span class="line"><span class="params">  componentIds?: <span class="built_in">string</span>[],</span></span><br><span class="line"><span class="params">  context?: &#123; session?: <span class="built_in">any</span> &#125;</span></span><br><span class="line"><span class="params"></span>): <span class="title class_">Record</span>&lt;<span class="built_in">string</span>, <span class="built_in">any</span>&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="attr">tools</span>: <span class="title class_">Record</span>&lt;<span class="built_in">string</span>, <span class="built_in">any</span>&gt; = &#123;&#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> component <span class="keyword">of</span> componentsRegistry) &#123;</span><br><span class="line">    <span class="keyword">if</span> (componentIds &amp;&amp; !componentIds.<span class="title function_">includes</span>(component.<span class="property">id</span>)) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (component.<span class="property">toolName</span> &amp;&amp; component.<span class="property">toolExecute</span>) &#123;</span><br><span class="line">      tools[component.<span class="property">toolName</span>] = &#123;</span><br><span class="line">        <span class="attr">description</span>: component.<span class="property">toolDescription</span>,</span><br><span class="line">        <span class="attr">parameters</span>: component.<span class="property">toolParameters</span>,</span><br><span class="line">        <span class="attr">execute</span>: <span class="keyword">async</span> (<span class="attr">params</span>: <span class="built_in">any</span>) =&gt; &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">await</span> component.<span class="property">toolExecute</span>!(params, context);</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> tools;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-Bot-配置加载"><a href="#2-Bot-配置加载" class="headerlink" title="2. Bot 配置加载"></a>2. Bot 配置加载</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (botId) &#123;</span><br><span class="line">  <span class="keyword">const</span> bot = <span class="keyword">await</span> <span class="title function_">getBotById</span>(&#123; <span class="attr">id</span>: botId &#125;);</span><br><span class="line">  <span class="keyword">if</span> (bot) &#123;</span><br><span class="line">    componentIds = (bot.<span class="property">componentIds</span> <span class="keyword">as</span> <span class="built_in">string</span>[]) || [];</span><br><span class="line">    systemPrompt = bot.<span class="property">prompt</span> || <span class="variable constant_">DEFAULT_SYSTEM_PROMPT</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> tools = <span class="title function_">buildToolsFromRegistry</span>(componentIds, &#123; session &#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="设计模式说明"><a href="#设计模式说明" class="headerlink" title="设计模式说明"></a>设计模式说明</h3><ol>
+<li><strong>注册表模式</strong>：使用组件注册表统一管理组件和工具定义</li>
+<li><strong>策略模式</strong>：不同 Bot 使用不同的工具集和提示词</li>
+<li><strong>工厂模式</strong>：<code>buildToolsFromRegistry</code> 动态构建工具对象</li>
+</ol>
+<h3 id="性能优化技巧"><a href="#性能优化技巧" class="headerlink" title="性能优化技巧"></a>性能优化技巧</h3><ol>
+<li><strong>使用 useMemo</strong>：缓存计算结果，避免不必要的重新计算</li>
+<li><strong>流式响应</strong>：减少首字节时间（TTFB），提升用户体验</li>
+<li><strong>代码分割</strong>：Next.js 自动进行代码分割，按需加载</li>
+<li><strong>图片优化</strong>：使用 <code>next/image</code> 组件自动优化图片</li>
+</ol>
+<hr>
+<h2 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h2><h3 id="项目亮点总结"><a href="#项目亮点总结" class="headerlink" title="项目亮点总结"></a>项目亮点总结</h3><ol>
+<li><strong>组件化架构</strong>：20+ 个可复用组件，支持动态注册和渲染</li>
+<li><strong>Bot 系统</strong>：灵活的 Bot 创建和管理机制</li>
+<li><strong>工具调用</strong>：AI SDK 的工具调用能力与 UI 组件无缝集成</li>
+<li><strong>类型安全</strong>：TypeScript + Drizzle ORM 提供端到端的类型安全</li>
+<li><strong>开发体验</strong>：Next.js App Router + AI SDK 提供优秀的开发体验</li>
+</ol>
+<h3 id="技术选型思考"><a href="#技术选型思考" class="headerlink" title="技术选型思考"></a>技术选型思考</h3><ul>
+<li><strong>Next.js 15</strong>：App Router 提供了更好的性能和开发体验</li>
+<li><strong>AI SDK</strong>：统一的 API，支持多种模型提供商</li>
+<li><strong>Drizzle ORM</strong>：类型安全的数据库访问，比 Prisma 更轻量</li>
+<li><strong>Vercel 平台</strong>：Serverless 架构，自动扩展，零运维</li>
+</ul>
+<h3 id="未来改进方向"><a href="#未来改进方向" class="headerlink" title="未来改进方向"></a>未来改进方向</h3><ol>
+<li><strong>组件扩展</strong>：添加更多实用组件（图表、表单等）</li>
+<li><strong>插件系统</strong>：支持第三方组件插件</li>
+<li><strong>多模型支持</strong>：允许用户选择不同的 AI 模型</li>
+<li><strong>协作功能</strong>：支持多人协作创建 Bot</li>
+<li><strong>性能监控</strong>：添加性能监控和错误追踪</li>
+</ol>
+<hr>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>通过 Next.js、AI SDK 和 Vercel 的组合，我们构建了一个功能完善、架构清晰的 AI 聊天机器人平台。这个项目展示了现代 Web 开发的最佳实践，包括类型安全、组件化设计、Serverless 架构等。</p>
+<p>希望本文能够帮助读者理解如何构建类似的 AI 应用，也欢迎在 GitHub 上查看完整的源代码。</p>
+<hr>
+<p><strong>相关资源</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://nextjs.org/docs">Next.js 文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://sdk.vercel.ai/docs">Vercel AI SDK 文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://orm.drizzle.team/">Drizzle ORM 文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vercel-labs/gemini-chatbot">项目 GitHub 仓库</a></li>
+</ul>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://adou2236.github.io/2025/12/19/cursor%E4%BD%BF%E7%94%A8%E4%BD%93%E9%AA%8C%E4%B8%8E%E6%99%BA%E8%83%BD%E4%BD%93%E5%BC%80%E5%8F%91vercel%E9%83%A8%E7%BD%B2/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cursor/" rel="tag">cursor</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gemini/" rel="tag">gemini</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vercel/" rel="tag">vercel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%99%BA%E8%83%BD%E4%BD%93%E5%BC%80%E5%8F%91/" rel="tag">智能体开发</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2025/05/09/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E4%B8%8E%E5%8F%91%E5%B8%83/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">谷歌浏览器插件开发与发布</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2022-2025
+        <i class="ri-heart-fill heart_icon"></i> 阿斗
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.svg" alt="阿斗的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">记录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/collection">收藏</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">照片</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/games">游戏</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯可乐吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpeg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpeg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>

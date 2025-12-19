@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>谷歌浏览器插件开发与发布 |  阿斗的个人博客</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/favicon.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    </head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-谷歌浏览器插件开发与发布"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  谷歌浏览器插件开发与发布
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2025/05/09/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E4%B8%8E%E5%8F%91%E5%B8%83/" class="article-date">
+  <time datetime="2025-05-09T02:02:38.000Z" itemprop="datePublished">2025-05-09</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">13 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>日常开发测试中出现了如下情况，需要测试表单提交之后的操作，但是提交之前会进行表单完整性校验，检验不通过的话无法进行下一步，输入的数据比如手机号、邮箱、身份证之类的信息又需要输入争取的格式，非常花费时间。如何能快速生成就好了，既加快了测试的速度，也能避免测试数据“不正经”、“不好看”。</p>
+<h2 id="一、项目概览"><a href="#一、项目概览" class="headerlink" title="一、项目概览"></a>一、项目概览</h2><h3 id="核心功能"><a href="#核心功能" class="headerlink" title="核心功能"></a>核心功能</h3><p>这是一个智能表单自动填充插件,支持:</p>
+<ul>
+<li>🔥 <strong>热键触发</strong>: 在任意输入框输入 <code>#</code> + 关键词,自动联想并生成数据</li>
+<li>📝 <strong>正则驱动</strong>: 通过正则表达式配置生成规则,灵活且强大</li>
+<li>🎨 <strong>可视化配置</strong>: 提供完整的配置界面,支持规则的增删改查</li>
+<li>💾 <strong>配置同步</strong>: 基于 chrome.storage.sync 实现跨设备同步</li>
+<li>🌍 <strong>多浏览器支持</strong>: 同时支持 Chrome 和 Firefox</li>
+</ul>
+<h3 id="技术栈"><a href="#技术栈" class="headerlink" title="技术栈"></a>技术栈</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;核心框架&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Vue 3 + TypeScript&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;构建工具&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Vite 6 + @crxjs/vite-plugin&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;状态管理&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Pinia&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;路由&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Vue Router + unplugin-vue-router&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;UI框架&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Element Plus + TailwindCSS + DaisyUI&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;工具库&quot;</span><span class="punctuation">:</span> <span class="string">&quot;VueUse + webextension-polyfill + RandExp&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、架构设计"><a href="#二、架构设计" class="headerlink" title="二、架构设计"></a>二、架构设计</h2><h3 id="2-1-整体架构"><a href="#2-1-整体架构" class="headerlink" title="2.1 整体架构"></a>2.1 整体架构</h3><p>Chrome 插件的核心在于多个独立上下文之间的协作。我的插件采用了以下架构:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│                     Background (Service Worker)         │</span><br><span class="line">│  - 消息中转站                                             │</span><br><span class="line">│  - 安装/更新事件处理                                       │</span><br><span class="line">│  - 存储管理                                              │</span><br><span class="line">└──────────┬────────────────────────────┬─────────────────┘</span><br><span class="line">           │                            │</span><br><span class="line">    ┌──────▼──────┐            ┌───────▼───────┐</span><br><span class="line">    │ Action Popup │            │ Options Page  │</span><br><span class="line">    │ (工具栏弹窗)   │            │ (设置页面)     │</span><br><span class="line">    └──────────────┘            └───────────────┘</span><br><span class="line"></span><br><span class="line">┌─────────────────────────────────────────────────────────┐</span><br><span class="line">│                        Content Script                   │</span><br><span class="line">│  - 监听页面输入框                                          │</span><br><span class="line">│  - 热键检测与匹配                                          │</span><br><span class="line">│  - 动态注入 iframe                                        │</span><br><span class="line">└──────────┬──────────────────────────────────────────────┘</span><br><span class="line">           │</span><br><span class="line">    ┌──────▼──────────┐</span><br><span class="line">    │  Iframe (隔离)   │</span><br><span class="line">    │  - 显示联想结果   │</span><br><span class="line">    │  - 处理用户选择   │</span><br><span class="line">    └─────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-目录结构"><a href="#2-2-目录结构" class="headerlink" title="2.2 目录结构"></a>2.2 目录结构</h3><p>项目采用了清晰的模块化目录结构:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">src/</span><br><span class="line">├── background/          # Service Worker 后台脚本</span><br><span class="line">├── content-script/      # 注入到页面的脚本</span><br><span class="line">├── ui/                  # 各类用户界面</span><br><span class="line">│   ├── action-popup/    # 工具栏弹窗</span><br><span class="line">│   ├── options-page/    # 选项页面</span><br><span class="line">│   ├── content-script-iframe/  # 内容脚本 iframe</span><br><span class="line">│   ├── side-panel/      # 侧边栏</span><br><span class="line">│   ├── devtools-panel/  # 开发者工具面板</span><br><span class="line">│   └── setup/           # 安装/更新页面</span><br><span class="line">├── stores/              # Pinia 状态管理</span><br><span class="line">├── composables/         # Vue 组合式函数</span><br><span class="line">├── components/          # 共享组件</span><br><span class="line">├── assets/              # 静态资源</span><br><span class="line">└── utils/               # 工具函数</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、核心技术实现"><a href="#三、核心技术实现" class="headerlink" title="三、核心技术实现"></a>三、核心技术实现</h2><h3 id="3-1-Content-Script-智能输入监听"><a href="#3-1-Content-Script-智能输入监听" class="headerlink" title="3.1 Content Script: 智能输入监听"></a>3.1 Content Script: 智能输入监听</h3><p>Content Script 是插件与网页交互的桥梁。我的实现重点在于:</p>
+<h4 id="监听输入框焦点"><a href="#监听输入框焦点" class="headerlink" title="监听输入框焦点"></a>监听输入框焦点</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/content-script/index.ts</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">focusListener</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// 监听焦点进入</span></span><br><span class="line">  <span class="variable language_">window</span>.<span class="property">document</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;focusin&#x27;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> element = e.<span class="property">target</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_">isEditableInput</span>(element)) &#123;</span><br><span class="line">      <span class="title function_">inputListenerAttach</span>(element <span class="keyword">as</span> <span class="title class_">HTMLInputElement</span> | <span class="title class_">HTMLTextAreaElement</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 监听焦点离开</span></span><br><span class="line">  <span class="variable language_">window</span>.<span class="property">document</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;focusout&#x27;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> element = e.<span class="property">target</span> <span class="keyword">as</span> <span class="title class_">HTMLElement</span>;</span><br><span class="line">    keywords.<span class="property">value</span> = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="title function_">closePopup</span>()</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_">isEditableInput</span>(element)) &#123;</span><br><span class="line">      <span class="title function_">inputListenerRemove</span>(element)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断是否为可编辑输入框</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">isEditableInput</span>(<span class="params">element: EventTarget | <span class="literal">null</span></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> element &amp;&amp; (</span><br><span class="line">    ((element <span class="keyword">instanceof</span> <span class="title class_">HTMLInputElement</span> || element <span class="keyword">instanceof</span> <span class="title class_">HTMLTextAreaElement</span>) &amp;&amp;</span><br><span class="line">      !element.<span class="property">disabled</span> &amp;&amp;</span><br><span class="line">      !element.<span class="property">readOnly</span></span><br><span class="line">    )</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>设计心得</strong>:</p>
+<ul>
+<li>使用 <code>focusin</code>/<code>focusout</code> 而非 <code>focus</code>/<code>blur</code>,因为前者支持事件冒泡</li>
+<li>动态绑定/解绑事件监听器,避免内存泄漏</li>
+<li>检查 <code>disabled</code> 和 <code>readOnly</code> 属性,避免干扰只读字段</li>
+</ul>
+<h4 id="热键检测与关键词提取"><a href="#热键检测与关键词提取" class="headerlink" title="热键检测与关键词提取"></a>热键检测与关键词提取</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">inputListener</span>(<span class="params">focusTarget: HTMLInputElement | HTMLTextAreaElement</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> &#123; hot_key &#125; = <span class="keyword">await</span> <span class="title function_">getSyncStorage</span>(<span class="string">&#x27;profile&#x27;</span>) <span class="keyword">as</span> <span class="variable constant_">PROFILE</span></span><br><span class="line">  <span class="keyword">const</span> currentValue = focusTarget.<span class="property">value</span>;</span><br><span class="line">  <span class="keyword">const</span> cursorPosition = focusTarget.<span class="property">selectionStart</span> || <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 从光标位置向前查找最近的热键</span></span><br><span class="line">  <span class="keyword">const</span> lastHashIndex = currentValue.<span class="title function_">lastIndexOf</span>(hot_key, cursorPosition - <span class="number">1</span>);</span><br><span class="line">  keywords.<span class="property">value</span> = currentValue.<span class="title function_">slice</span>(lastHashIndex, cursorPosition);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (keywords.<span class="property">value</span>.<span class="title function_">indexOf</span>(hot_key) !== -<span class="number">1</span>) &#123;</span><br><span class="line">    target.<span class="property">value</span> = focusTar<span class="keyword">get</span></span><br><span class="line">    <span class="title function_">handleSearch</span>(<span class="params">keywords.value</span>)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    target.<span class="property">value</span> &amp;&amp; <span class="title function_">closePopup</span>()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>技巧总结</strong>:</p>
+<ol>
+<li><strong>光标感知</strong>: 使用 <code>selectionStart</code> 获取光标位置,支持中间插入场景</li>
+<li><strong>反向搜索</strong>: <code>lastIndexOf</code> 从光标位置向前查找,确保匹配最近的触发词</li>
+<li><strong>防抖处理</strong>: 使用 lodash 的 <code>debounce</code> 延迟 300ms 触发搜索</li>
+</ol>
+<h3 id="3-2-Iframe-隔离方案"><a href="#3-2-Iframe-隔离方案" class="headerlink" title="3.2 Iframe 隔离方案"></a>3.2 Iframe 隔离方案</h3><p>为了避免插件的 CSS 样式污染宿主页面,我采用了 iframe 隔离方案:</p>
+<h4 id="动态注入-iframe"><a href="#动态注入-iframe" class="headerlink" title="动态注入 iframe"></a>动态注入 iframe</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">renderTooltip</span>(<span class="params">keywords: <span class="built_in">string</span></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> tooltip = <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;ac-tooltip&#x27;</span>)</span><br><span class="line">  <span class="keyword">if</span>(!tooltip)&#123;</span><br><span class="line">    tooltip = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;div&#x27;</span>)</span><br><span class="line">    tooltip.<span class="property">id</span> = <span class="string">&#x27;ac-tooltip&#x27;</span></span><br><span class="line">    tooltip.<span class="property">className</span> = <span class="string">&#x27;ac-popup&#x27;</span></span><br><span class="line">    tooltip.<span class="property">role</span> = <span class="string">&#x27;tooltip&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建 iframe</span></span><br><span class="line">    <span class="keyword">const</span> iframe = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;iframe&#x27;</span>)</span><br><span class="line">    iframe.<span class="property">id</span> = <span class="string">&#x27;ac-iframe&#x27;</span></span><br><span class="line">    iframe.<span class="title function_">setAttribute</span>(<span class="string">&#x27;src&#x27;</span>, chrome.<span class="property">runtime</span>.<span class="title function_">getURL</span>(<span class="string">&quot;src/ui/content-script-iframe/index.html&quot;</span>))</span><br><span class="line">    tooltip.<span class="title function_">appendChild</span>(iframe)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> tooltip</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用-Popper-js-实现智能定位"><a href="#使用-Popper-js-实现智能定位" class="headerlink" title="使用 Popper.js 实现智能定位"></a>使用 Popper.js 实现智能定位</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createPopper &#125; <span class="keyword">from</span> <span class="string">&quot;@popperjs/core&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">createPopper</span>(target.<span class="property">value</span> <span class="keyword">as</span> <span class="title class_">Element</span>, tooltip, &#123;</span><br><span class="line">  <span class="attr">placement</span>: <span class="string">&#x27;auto&#x27;</span>,</span><br><span class="line">  <span class="attr">modifiers</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">name</span>: <span class="string">&#x27;flip&#x27;</span>,</span><br><span class="line">      <span class="attr">options</span>: &#123;</span><br><span class="line">        <span class="attr">allowedAutoPlacements</span>: [<span class="string">&#x27;top&#x27;</span>, <span class="string">&#x27;bottom&#x27;</span>],</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  ],</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><strong>最佳实践</strong>:</p>
+<ul>
+<li><code>placement: &#39;auto&#39;</code> 自动选择最佳位置</li>
+<li><code>flip</code> 修饰符在空间不足时自动翻转</li>
+<li>iframe 需要在 <code>manifest.config.ts</code> 中声明为 <code>web_accessible_resources</code></li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// manifest.config.ts</span></span><br><span class="line"><span class="attr">web_accessible_resources</span>: [</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="string">&quot;resources&quot;</span>: [<span class="string">&quot;src/ui/content-script-iframe/index.html&quot;</span>],</span><br><span class="line">    <span class="string">&quot;matches&quot;</span>: [<span class="string">&quot;&lt;all_urls&gt;&quot;</span>]</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-消息通信机制"><a href="#3-3-消息通信机制" class="headerlink" title="3.3 消息通信机制"></a>3.3 消息通信机制</h3><p>插件的各个部分运行在不同的上下文中,消息通信是核心挑战。</p>
+<h4 id="Background-作为消息中转站"><a href="#Background-作为消息中转站" class="headerlink" title="Background 作为消息中转站"></a>Background 作为消息中转站</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/background/index.ts</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">startServiceWorker</span>(<span class="params"></span>) &#123;</span><br><span class="line">  chrome.<span class="property">runtime</span>.<span class="property">onMessage</span>.<span class="title function_">addListener</span>(<span class="function">(<span class="params">&#123;<span class="keyword">type</span>, payload&#125;, sender, sendResponse</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">type</span> === <span class="string">&#x27;sendMessage&#x27;</span>)&#123;</span><br><span class="line">      chrome.<span class="property">runtime</span>.<span class="title function_">sendMessage</span>(&#123; <span class="attr">from</span>: payload.<span class="property">from</span>, <span class="attr">data</span>: payload.<span class="property">data</span>&#125;, <span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="title function_">sendResponse</span>(response)</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="keyword">type</span> === <span class="string">&#x27;sendMessageTab&#x27;</span>)&#123;</span><br><span class="line">      chrome.<span class="property">tabs</span>.<span class="title function_">query</span>(&#123; <span class="attr">active</span>: <span class="literal">true</span>, <span class="attr">currentWindow</span>: <span class="literal">true</span> &#125;, <span class="function">(<span class="params">tabs</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (tabs.<span class="property">length</span> === <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">const</span> tabId = tabs[<span class="number">0</span>].<span class="property">id</span>;</span><br><span class="line">        chrome.<span class="property">tabs</span>.<span class="title function_">sendMessage</span>(tabId, &#123; <span class="attr">from</span>: payload.<span class="property">from</span>, <span class="attr">data</span>: payload.<span class="property">data</span>&#125;, <span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="title function_">sendResponse</span>(response);</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span> <span class="comment">// 保持消息通道开启</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>通信流程</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Content Script (输入关键词)</span><br><span class="line">    ↓ 发送消息</span><br><span class="line">Background (转发)</span><br><span class="line">    ↓ 转发到 iframe</span><br><span class="line">Content Script Iframe (处理并返回数据)</span><br><span class="line">    ↓ 返回结果</span><br><span class="line">Content Script (显示结果)</span><br><span class="line">    ↓ 用户选择</span><br><span class="line">Content Script (填充数据)</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意事项</strong>:</p>
+<ul>
+<li>必须 <code>return true</code> 保持异步消息通道开启</li>
+<li>使用 <code>chrome.tabs.sendMessage</code> 需要 <code>activeTab</code> 权限</li>
+</ul>
+<h3 id="3-4-正则表达式驱动的数据生成"><a href="#3-4-正则表达式驱动的数据生成" class="headerlink" title="3.4 正则表达式驱动的数据生成"></a>3.4 正则表达式驱动的数据生成</h3><p>使用 RandExp 库根据正则表达式生成随机数据:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/stores/options.store.ts</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">RandExp</span> <span class="keyword">from</span> <span class="string">&quot;randexp&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 扩展字符集以支持中文</span></span><br><span class="line"><span class="title class_">RandExp</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">defaultRange</span>.<span class="title function_">add</span>(<span class="number">0</span>, <span class="number">65535</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">generateData</span>(<span class="params">rule: RULE</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; regex &#125; = rule</span><br><span class="line">  <span class="keyword">if</span> (regex) &#123;</span><br><span class="line">    <span class="keyword">const</span> randexp = <span class="keyword">new</span> <span class="title class_">RandExp</span>(regex);</span><br><span class="line">    <span class="keyword">const</span> randomStrings = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; profile.<span class="property">value</span>.<span class="property">count</span>; i++) &#123;</span><br><span class="line">      randomStrings.<span class="title function_">push</span>(randexp.<span class="title function_">gen</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> randomStrings</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="示例配置"><a href="#示例配置" class="headerlink" title="示例配置"></a>示例配置</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;label&quot;</span><span class="punctuation">:</span> <span class="string">&quot;邮箱&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;express&quot;</span><span class="punctuation">:</span> <span class="string">&quot;email&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;regex&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^[a-z]&#123;5,10&#125;@[a-z]&#123;2,5&#125;\\.[a-z]&#123;2,3&#125;$&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>生成结果: <code>abcde@test.com</code>, <code>hello@demo.org</code> 等</p>
+<h3 id="3-5-存储与配置管理"><a href="#3-5-存储与配置管理" class="headerlink" title="3.5 存储与配置管理"></a>3.5 存储与配置管理</h3><h4 id="使用-chrome-storage-sync-实现跨设备同步"><a href="#使用-chrome-storage-sync-实现跨设备同步" class="headerlink" title="使用 chrome.storage.sync 实现跨设备同步"></a>使用 chrome.storage.sync 实现跨设备同步</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 封装的存储 composable</span></span><br><span class="line"><span class="keyword">const</span> &#123; <span class="attr">data</span>: profile &#125; = useBrowserSyncStorage&lt;<span class="variable constant_">PROFILE</span>&gt;(<span class="string">&quot;profile&quot;</span>, defaultConfig)</span><br></pre></td></tr></table></figure>
+
+<h4 id="配置导入-导出"><a href="#配置导入-导出" class="headerlink" title="配置导入/导出"></a>配置导入/导出</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 导出配置</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">exportConfig</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> config = <span class="title function_">cloneDeep</span>(profile.<span class="property">value</span>)</span><br><span class="line">  <span class="keyword">delete</span> config.<span class="property">effective</span></span><br><span class="line">  <span class="keyword">const</span> jsonString = <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(config, <span class="literal">null</span>, <span class="number">2</span>);</span><br><span class="line">  <span class="keyword">const</span> blob = <span class="keyword">new</span> <span class="title class_">Blob</span>([jsonString], &#123; <span class="attr">type</span>: <span class="string">&#x27;application/json&#x27;</span> &#125;);</span><br><span class="line">  <span class="keyword">const</span> url = <span class="variable constant_">URL</span>.<span class="title function_">createObjectURL</span>(blob);</span><br><span class="line">  <span class="keyword">const</span> a = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">  a.<span class="property">href</span> = url;</span><br><span class="line">  a.<span class="property">download</span> = <span class="string">&#x27;config.json&#x27;</span>;</span><br><span class="line">  <span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">appendChild</span>(a);</span><br><span class="line">  a.<span class="title function_">click</span>();</span><br><span class="line">  <span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">removeChild</span>(a);</span><br><span class="line">  <span class="variable constant_">URL</span>.<span class="title function_">revokeObjectURL</span>(url);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 导入配置 (带类型校验)</span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">importConfig</span> = <span class="keyword">async</span> (<span class="params">file: File</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> text = <span class="keyword">await</span> file.<span class="title function_">text</span>()</span><br><span class="line">    <span class="keyword">let</span> config = <span class="title class_">JSON</span>.<span class="title function_">parse</span>(text) <span class="keyword">as</span> <span class="variable constant_">PROFILE</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="title function_">isProfile</span>(config))&#123;</span><br><span class="line">      profile.<span class="property">value</span> = &#123; <span class="attr">effective</span>: profile.<span class="property">value</span>.<span class="property">effective</span>, ...config &#125;;</span><br><span class="line">      <span class="title class_">ElMessage</span>.<span class="title function_">success</span>(<span class="string">&#x27;导入成功&#x27;</span>)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;导入失败&#x27;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="title class_">ElMessage</span>.<span class="title function_">error</span>(<span class="string">&#x27;导入失败&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、开发工具链"><a href="#四、开发工具链" class="headerlink" title="四、开发工具链"></a>四、开发工具链</h2><h3 id="4-1-Vite-CRXJS-的威力"><a href="#4-1-Vite-CRXJS-的威力" class="headerlink" title="4.1 Vite + CRXJS 的威力"></a>4.1 Vite + CRXJS 的威力</h3><p><code>@crxjs/vite-plugin</code> 是 Chrome 插件开发的神器:</p>
+<ul>
+<li>✅ 自动处理 Manifest V3 配置</li>
+<li>✅ 支持 HMR (热模块替换)</li>
+<li>✅ 自动处理资源路径</li>
+<li>✅ TypeScript 类型支持</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// vite.chrome.config.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; crx &#125; <span class="keyword">from</span> <span class="string">&quot;@crxjs/vite-plugin&quot;</span></span><br><span class="line"><span class="keyword">import</span> manifest <span class="keyword">from</span> <span class="string">&quot;./manifest.chrome.config&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title function_">defineConfig</span>(&#123;</span><br><span class="line">  <span class="attr">plugins</span>: [</span><br><span class="line">    <span class="title function_">crx</span>(&#123; manifest &#125;),</span><br><span class="line">    <span class="comment">// ... 其他插件</span></span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-unplugin-生态的应用"><a href="#4-2-unplugin-生态的应用" class="headerlink" title="4.2 unplugin 生态的应用"></a>4.2 unplugin 生态的应用</h3><h4 id="自动路由-unplugin-vue-router"><a href="#自动路由-unplugin-vue-router" class="headerlink" title="自动路由 (unplugin-vue-router)"></a>自动路由 (unplugin-vue-router)</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">VueRouter</span>(&#123;</span><br><span class="line">  <span class="attr">dts</span>: <span class="string">&quot;src/types/typed-router.d.ts&quot;</span>,</span><br><span class="line">  <span class="attr">routesFolder</span>: <span class="title function_">getImmediateDirectories</span>(<span class="string">&quot;src/ui&quot;</span>).<span class="title function_">map</span>(<span class="function">(<span class="params">dir</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      <span class="attr">src</span>: <span class="string">`src/ui/<span class="subst">$&#123;dir&#125;</span>/pages`</span>,</span><br><span class="line">      <span class="attr">path</span>: <span class="string">`<span class="subst">$&#123;dir&#125;</span>/`</span>,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;),</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>只需在 <code>pages/</code> 目录下创建 <code>.vue</code> 文件,路由自动生成!</p>
+<h4 id="自动导入-unplugin-auto-import"><a href="#自动导入-unplugin-auto-import" class="headerlink" title="自动导入 (unplugin-auto-import)"></a>自动导入 (unplugin-auto-import)</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">AutoImport</span>(&#123;</span><br><span class="line">  <span class="attr">imports</span>: [</span><br><span class="line">    <span class="string">&quot;vue&quot;</span>,</span><br><span class="line">    <span class="string">&quot;vue-router&quot;</span>,</span><br><span class="line">    <span class="string">&quot;@vueuse/core&quot;</span>,</span><br><span class="line">    <span class="string">&quot;pinia&quot;</span>,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">&quot;webextension-polyfill&quot;</span>: [[<span class="string">&quot;*&quot;</span>, <span class="string">&quot;browser&quot;</span>]],</span><br><span class="line">    &#125;,</span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">dts</span>: <span class="string">&quot;src/types/auto-imports.d.ts&quot;</span>,</span><br><span class="line">  <span class="attr">dirs</span>: [<span class="string">&quot;src/composables/**&quot;</span>, <span class="string">&quot;src/stores/**&quot;</span>, <span class="string">&quot;src/utils/**&quot;</span>],</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>无需手动 import,直接使用 <code>ref</code>、<code>computed</code>、<code>useOptionsStore</code> 等!</p>
+<h4 id="组件自动注册-unplugin-vue-components"><a href="#组件自动注册-unplugin-vue-components" class="headerlink" title="组件自动注册 (unplugin-vue-components)"></a>组件自动注册 (unplugin-vue-components)</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Components</span>(&#123;</span><br><span class="line">  <span class="attr">dirs</span>: [<span class="string">&quot;src/components&quot;</span>],</span><br><span class="line">  <span class="attr">dts</span>: <span class="string">&quot;src/types/components.d.ts&quot;</span>,</span><br><span class="line">  <span class="attr">resolvers</span>: [<span class="title class_">IconsResolver</span>()],</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-跨浏览器兼容"><a href="#4-3-跨浏览器兼容" class="headerlink" title="4.3 跨浏览器兼容"></a>4.3 跨浏览器兼容</h3><p>通过分离配置文件支持 Chrome 和 Firefox:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">├── vite.config.ts          # 基础配置</span><br><span class="line">├── vite.chrome.config.ts   # Chrome 特定配置</span><br><span class="line">├── vite.firefox.config.ts  # Firefox 特定配置</span><br><span class="line">├── manifest.config.ts      # 通用 manifest</span><br><span class="line">├── manifest.chrome.config.ts</span><br><span class="line">└── manifest.firefox.config.ts</span><br></pre></td></tr></table></figure>
+
+<p>构建命令:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;scripts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;build:chrome&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cross-env NODE_ENV=production vite build -c vite.chrome.config.ts&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;build:firefox&quot;</span><span class="punctuation">:</span> <span class="string">&quot;cross-env NODE_ENV=production vite build -c vite.firefox.config.ts&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="五、开发痛点与解决方案"><a href="#五、开发痛点与解决方案" class="headerlink" title="五、开发痛点与解决方案"></a>五、开发痛点与解决方案</h2><h3 id="5-1-HMR-在-Service-Worker-中的限制"><a href="#5-1-HMR-在-Service-Worker-中的限制" class="headerlink" title="5.1 HMR 在 Service Worker 中的限制"></a>5.1 HMR 在 Service Worker 中的限制</h3><p><strong>问题</strong>: Manifest V3 的 background 使用 Service Worker,不支持传统的 HMR。</p>
+<p><strong>解决方案</strong>:</p>
+<ul>
+<li>使用 <code>chrome.runtime.reload()</code> 在代码更新时自动重载</li>
+<li>@crxjs/vite-plugin 会自动处理大部分场景</li>
+</ul>
+<h3 id="5-2-Content-Script-样式污染"><a href="#5-2-Content-Script-样式污染" class="headerlink" title="5.2 Content Script 样式污染"></a>5.2 Content Script 样式污染</h3><p><strong>问题</strong>: Content Script 注入的 CSS 会影响宿主页面。</p>
+<p><strong>解决方案</strong>:</p>
+<ol>
+<li>使用 iframe 完全隔离</li>
+<li>为 Content Script 的样式添加唯一前缀</li>
+<li>使用 Shadow DOM (更复杂但更彻底)</li>
+</ol>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// src/content-script/index.scss</span></span><br><span class="line"><span class="selector-class">.ac-popup</span> &#123;</span><br><span class="line">  <span class="attribute">all</span>: initial; <span class="comment">// 重置所有样式</span></span><br><span class="line">  <span class="attribute">position</span>: fixed;</span><br><span class="line">  <span class="attribute">z-index</span>: <span class="number">999999</span>;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-TypeScript-类型安全"><a href="#5-3-TypeScript-类型安全" class="headerlink" title="5.3 TypeScript 类型安全"></a>5.3 TypeScript 类型安全</h3><p><strong>问题</strong>: chrome API 的类型定义不完整。</p>
+<p><strong>解决方案</strong>:</p>
+<ul>
+<li>使用 <code>chrome-types</code> 提供完整的类型</li>
+<li>使用 <code>webextension-polyfill</code> 提供 Promise 化的 API</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">ManifestV3Export</span> &#125; <span class="keyword">from</span> <span class="string">&quot;@crxjs/vite-plugin&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125; <span class="keyword">as</span> <span class="title class_">ManifestV3Export</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-4-调试技巧"><a href="#5-4-调试技巧" class="headerlink" title="5.4 调试技巧"></a>5.4 调试技巧</h3><ol>
+<li><p><strong>Background 调试</strong>:</p>
+<ul>
+<li><code>chrome://extensions/</code> → 找到插件 → 点击 “Service Worker” 链接</li>
+</ul>
+</li>
+<li><p><strong>Content Script 调试</strong>:</p>
+<ul>
+<li>直接在页面的 DevTools Console 中查看</li>
+</ul>
+</li>
+<li><p><strong>Popup 调试</strong>:</p>
+<ul>
+<li>右键 Popup → 检查</li>
+</ul>
+</li>
+<li><p><strong>使用 console.info 而非 console.log</strong>:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">info</span>(<span class="string">&quot;hello world from content-script&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="六、最佳实践总结"><a href="#六、最佳实践总结" class="headerlink" title="六、最佳实践总结"></a>六、最佳实践总结</h2><h3 id="6-1-项目组织"><a href="#6-1-项目组织" class="headerlink" title="6.1 项目组织"></a>6.1 项目组织</h3><p>✅ <strong>按功能模块组织</strong>,而非按文件类型<br>✅ <strong>每个 UI 入口独立一个目录</strong>,包含 pages/components/index.html<br>✅ <strong>使用 TypeScript</strong> 获得完整的类型安全<br>✅ <strong>composables 模式</strong> 复用逻辑</p>
+<h3 id="6-2-性能优化"><a href="#6-2-性能优化" class="headerlink" title="6.2 性能优化"></a>6.2 性能优化</h3><p>✅ <strong>Debounce 输入事件</strong>: 避免频繁触发<br>✅ <strong>懒加载 iframe</strong>: 只在需要时创建<br>✅ <strong>使用 chrome.storage.sync</strong>: 数据自动同步,无需手动处理</p>
+<h3 id="6-3-用户体验"><a href="#6-3-用户体验" class="headerlink" title="6.3 用户体验"></a>6.3 用户体验</h3><p>✅ <strong>提供安装/更新引导页</strong>: 利用 <code>chrome.runtime.onInstalled</code> 事件<br>✅ <strong>热键可配置</strong>: 不同用户有不同习惯<br>✅ <strong>视觉反馈</strong>: 使用 Popper.js 确保 popup 始终可见<br>✅ <strong>键盘友好</strong>: 支持键盘选择和 ESC 关闭</p>
+<h3 id="6-4-代码质量"><a href="#6-4-代码质量" class="headerlink" title="6.4 代码质量"></a>6.4 代码质量</h3><p>✅ <strong>ESLint + Prettier</strong>: 统一代码风格<br>✅ <strong>TypeScript strict 模式</strong>: 捕获更多潜在问题<br>✅ <strong>错误处理</strong>: 使用全局错误监听器</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">self.<span class="property">onerror</span> = <span class="keyword">function</span> (<span class="params">message, source, lineno, colno, error</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">info</span>(<span class="string">&quot;Error: &quot;</span> + message)</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">info</span>(<span class="string">&quot;Source: &quot;</span> + source)</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">info</span>(<span class="string">&quot;Line: &quot;</span> + lineno)</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">info</span>(<span class="string">&quot;Column: &quot;</span> + colno)</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">info</span>(<span class="string">&quot;Error object: &quot;</span> + error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="七、扩展功能展望"><a href="#七、扩展功能展望" class="headerlink" title="七、扩展功能展望"></a>七、扩展功能展望</h2><p>🔮 <strong>未来可能的优化方向</strong>:</p>
+<ol>
+<li><strong>AI 智能填充</strong>: 集成 LLM 根据上下文智能生成数据</li>
+<li><strong>数据模板</strong>: 支持保存常用的数据集</li>
+<li><strong>团队共享</strong>: 配置云同步和分享</li>
+<li><strong>录制/回放</strong>: 记录填充操作,支持批量重放</li>
+<li><strong>国际化</strong>: 支持更多语言的随机数据生成</li>
+</ol>
+<h2 id="八、总结"><a href="#八、总结" class="headerlink" title="八、总结"></a>八、总结</h2><p>开发 Chrome 插件是一次非常有趣的体验,涉及的技术栈很广:</p>
+<ul>
+<li><strong>前端框架</strong>: Vue 3 生态的各种库</li>
+<li><strong>构建工具</strong>: Vite 的现代化开发体验</li>
+<li><strong>浏览器 API</strong>: Chrome Extension API 的深度使用</li>
+<li><strong>架构设计</strong>: 多上下文通信与状态管理</li>
+</ul>
+<p>关键要点:</p>
+<ol>
+<li>理解 Chrome 插件的多上下文模型</li>
+<li>善用 iframe 隔离避免样式冲突</li>
+<li>设计清晰的消息通信机制</li>
+<li>利用现代工具链提高开发效率</li>
+<li>注重类型安全和代码质量</li>
+</ol>
+<p>希望这篇文章能帮助你快速上手 Chrome 插件开发!完整代码可在 GitHub 查看。</p>
+<h2 id="参考资源"><a href="#参考资源" class="headerlink" title="参考资源"></a>参考资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/extensions/">Chrome Extension 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/extensions/migrating/">Manifest V3 迁移指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://crxjs.dev/vite-plugin/">@crxjs/vite-plugin</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/fent/randexp.js">RandExp.js</a></li>
+<li><a target="_blank" rel="noopener" href="https://popper.js.org/">Popper.js</a></li>
+</ul>
+<hr>
+<p><strong>作者</strong>: 基于实战项目总结<br><strong>项目</strong>: Form AutoComplete Chrome Extension<br><strong>技术栈</strong>: Vue 3 + Vite + Manifest V3<br><strong>License</strong>: 开源项目</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://adou2236.github.io/2025/05/09/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91%E4%B8%8E%E5%8F%91%E5%B8%83/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91/" rel="tag">前端开发</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8F%92%E4%BB%B6/" rel="tag">谷歌浏览器插件</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2025/12/19/cursor%E4%BD%BF%E7%94%A8%E4%BD%93%E9%AA%8C%E4%B8%8E%E6%99%BA%E8%83%BD%E4%BD%93%E5%BC%80%E5%8F%91vercel%E9%83%A8%E7%BD%B2/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            cursor使用体验与智能体组件开发
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/03/15/vue%E5%93%8D%E5%BA%94%E6%9B%B4%E6%96%B0bug%E8%AE%B0%E5%BD%95/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">vue响应更新bug记录</div>
+      </a>
+    
+  </nav>
+
+  
+   
+    
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2022-2025
+        <i class="ri-heart-fill heart_icon"></i> 阿斗
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/logo.svg" alt="阿斗的个人博客"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">记录</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/collection">收藏</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">照片</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/games">游戏</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯可乐吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpeg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpeg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
